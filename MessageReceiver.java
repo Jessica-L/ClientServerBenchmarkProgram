@@ -11,7 +11,7 @@ import java.io.*;
 /**
  * MessageReceiver program starts each thread to receive a message.
  */
-public class MessageReceiver extends Thread
+public class MessageReceiver extends Thread implements MessageSender<String>
 {
     
     DataInputStream input;
@@ -31,6 +31,28 @@ public class MessageReceiver extends Thread
         {
             System.out.println("MessageHandler: " + e.getMessage() );
         }
+    }
+
+    public void sendMessage(String str) {
+        System.out.println("Receive from: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " message - " + str);
+        try {
+            System.out.println(str);
+            output.writeInt(str.length());
+            output.writeBytes(str);
+        } catch (IOException e) {
+            System.out.println(e);
+            System.out.println("An Error Occured While Sending A Message.");
+        }
+
+        try 
+        {
+            clientSocket.close();
+        }
+        catch( IOException e )
+        {
+            System.out.println("Close failed: " + e.getMessage() );
+        }   
+        
     }
 
     public void run() 
@@ -58,12 +80,14 @@ public class MessageReceiver extends Thread
                     System.out.println("Read: " + e.getMessage() );
                 }
             }
+
             str = new String( digit );
+            System.out.println("hello" + str);
             //bufWriter.append( str );
             //bufWriter.close();
-            System.out.println("Receive from: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " message - " + str);
-            output.writeInt(str.length());
-            output.writeBytes(str);
+
+            MessageQueue.queue.add(new MessageContainer<String>(this,str));
+            
         }
         catch( EOFException e )
         {
@@ -74,14 +98,7 @@ public class MessageReceiver extends Thread
             System.out.println("Output file: " + e.getMessage() );
         }
         
-        try 
-        {
-            clientSocket.close();
-        }
-        catch( IOException e )
-        {
-            System.out.println("Close failed: " + e.getMessage() );
-        }         
+              
     }
     
 }
