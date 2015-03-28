@@ -44,7 +44,7 @@ public class TCPClientServer {
     // Starts server process.
     public static void startServer()
     {
-        ArrayList<String> argList = new ArrayList();
+        ArrayList<String> argList = new ArrayList<String>();
         argList.add("java");
         argList.add("TCPServer");
         startProcess( argList );
@@ -53,7 +53,7 @@ public class TCPClientServer {
     // Starts client process with unique id per process.
     public static void startClient( int num )
     {
-        ArrayList<String> argList = new ArrayList();
+        ArrayList<String> argList = new ArrayList<String>();
         argList.add("java");
         argList.add("TCPClient");
         argList.add( Integer.toString( num ) );
