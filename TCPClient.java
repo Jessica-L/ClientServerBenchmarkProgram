@@ -40,9 +40,8 @@ public class TCPClient
     public void sendAndReceiveMessage(byte[] data )
     {
         int numBytes = 0;
-        //String str = ""; // Only for testing.
+        String str = ""; // Only for testing.
         int len = 0;
-        
         try 
         {
             DataOutputStream output = new DataOutputStream( socket.getOutputStream() );
@@ -67,8 +66,8 @@ public class TCPClient
                 digit[i] = input.readByte();
             }
             // Next two lines only for testing:
-            //str = new String( digit );
-            //System.out.println("Received: " + str);
+            str = new String( digit );
+            System.out.println("Received: " + str);
         }
         catch( UnknownHostException e )
         {
@@ -149,7 +148,8 @@ public class TCPClient
             }
 
             id = tcpClient.getTCPClientId();
-            dataStream = tcpClient.intToByteArray( id );
+            // dataStream = tcpClient.intToByteArray( id );
+            dataStream = (byte[])(("" + id).getBytes());
 
             tcpClient.sendAndReceiveMessage( dataStream );
             
