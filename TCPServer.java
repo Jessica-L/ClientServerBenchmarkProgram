@@ -3,7 +3,6 @@
  * Authors: Jessica Lynch and Andrew Arnopoulos
  * Date:    27-Apr-2015
  */
-package tcpclientserver; // package for Netbeans project
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -46,34 +45,3 @@ public class TCPServer {
         }
     }
 }
-
-/* My old code.
-public class TCPServer {
-    public static void main (String args[])
-    {
-        try
-        {
-            int serverPort = 6880;
-            ServerSocket listenSocket = new ServerSocket( serverPort );
-            System.out.println("Server start listening now ...");
-            while( true ) {
-                try
-                {
-                    //Create socket and wait to receive message.
-                    Socket clientSocket = listenSocket.accept();
-                    //Spawn new thread to receive message.
-                    MessageReceiver mrThread = new MessageReceiver( clientSocket );
-                }
-                catch( IOException e )
-                {
-                    System.out.println("Listen: " + e.getMessage());
-                }
-            }
-        }
-        catch( IOException e )
-        {
-            System.out.println("Listen: " + e.getMessage());
-        }
-    }
-}
-*/

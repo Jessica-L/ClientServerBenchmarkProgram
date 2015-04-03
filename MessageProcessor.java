@@ -3,7 +3,6 @@
  * Authors: Jessica Lynch and Andrew Arnopoulos
  * Date:    27-Apr-2015
  */
-package tcpclientserver; // package for Netbeans project
 
 /**
  * MessageProcessor program starts each thread to process a message.

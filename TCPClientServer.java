@@ -3,7 +3,6 @@
  * Authors: Jessica Lynch and Andrew Arnopoulos
  * Date:    27-Apr-2015
  */
-package tcpclientserver; // package for Netbeans project
 
 import java.io.IOException;
 import java.util.ArrayList;

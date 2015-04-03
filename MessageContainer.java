@@ -1,29 +1,24 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Project: Client Server Performance Measurement Program
+ * Authors: Jessica Lynch and Andrew Arnopoulos
+ * Date:    27-Apr-2015
  */
-package tcpclientserver;
 
-/**
- *
- * @author Jessica
- */
 class MessageContainer<D>
 {
-	private MessageSender<D> sender = null;
-	private D data = null;
+    private MessageSender<D> sender = null;
+    private D data = null;
 
-	public MessageContainer(MessageSender<D> sender,D data) {
-		this.sender = sender;
-		this.data = data;
-	}
+    public MessageContainer(MessageSender<D> sender,D data) {
+            this.sender = sender;
+            this.data = data;
+    }
 
-	public MessageSender<D> getSender() {
-		return sender;
-	}
+    public MessageSender<D> getSender() {
+            return sender;
+    }
 
-	public D getData() {
-		return data;
-	}
+    public D getData() {
+            return data;
+    }
 }
