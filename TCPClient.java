@@ -3,7 +3,7 @@
  * Authors: Jessica Lynch and Andrew Arnopoulos
  * Date:    27-Apr-2015
  */
-//package tcpclientserver; // package for Netbeans project
+package tcpclientserver; // package for Netbeans project
 import java.net.*;
 import java.io.*;
 import java.nio.ByteBuffer;
