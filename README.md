@@ -32,8 +32,7 @@ We completed the following three implementations of a client-server program sinc
 1.	Shared memory client-server program in C, which involves implementation of a shared memory library (written in C) linked to by JNI, uses POSIX shared memory through queueing where memory is shared globally among all processes, and is locked using POSIX Pthread locks.  
 2.	TCP client-server program written in Java, which uses TCP for the transport of data and queueing for local shared memory among multiple threads, and is locked using Pthread mutex locks.  
 3.	Client-server program in Java using named pipes, which uses java pipes to provide communication between the client and the server, and is locked using standard Java locks.  
-  
-**Details of Our Progress (continued):**  
+    
 We also gave our client-server program a purpose by writing a module that serves as a translator and uses each implementation of client-server to translate single words and up to 250 words.  It is a simple design which doesn’t handle punctuation and can only translate word-by-word.  An existing concern, however, is that adding this feature will take away from the primary goal of our project since we are now no longer dealing with straight queueing.  The translator functionality naturally adds a data conversion aspect which will likely slow our performance testing and could slow it significantly as settings are maximized during the experiments.
 
 Certain challenges we faced with the above implementations included not allotting enough time for implementing the JNI for the shared memory client-server program in C.  We will therefore have it implemented prior to the week of April 6.  Initial testing has shown slow run times likely due to the translator functionality we added.
