@@ -1,8 +1,7 @@
-/* 
- * File:   SharedMemoryQueue.h
- * Author: Jessica
- *
- * Created on March 31, 2015, 11:37 PM
+/*
+ * Project: Client Server Performance Measurement Program
+ * Authors: Jessica Lynch and Andrew Arnopoulos
+ * Date:    27-Apr-2015
  */
 
 #ifndef SHAREDMEMORYQUEUE_H
@@ -12,11 +11,11 @@
 extern "C" {
 #endif
 
-#define DATA_SIZE 1024
+#define QUEUE_ENTRY_DATA_SIZE 1024
 
 typedef struct queueEntry
 {
-    char data[DATA_SIZE];
+    char data[QUEUE_ENTRY_DATA_SIZE];
     int prev;
     int next;
     int me;

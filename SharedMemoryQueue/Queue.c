@@ -1,6 +1,13 @@
+/*
+ * Project: Client Server Performance Measurement Program
+ * Authors: Jessica Lynch and Andrew Arnopoulos
+ * Date:    27-Apr-2015
+ */
+
 #include <stdlib.h>
 #include <pthread.h>
 #include <errno.h>
+#include "SharedMemoryQueue.h"
 
 #define TEST
 #define MAX_ENTRIES 1024
@@ -65,7 +72,7 @@ void q_server_init( void )
             entryArray[i].next = i+1;
         }
         
-        memset( entryArray[i].data, 0, DATA_SIZE );
+        memset( entryArray[i].data, 0, QUEUE_ENTRY_DATA_SIZE );
     }
     freeQ->head = 0;
     freeQ->tail = MAX_ENTRIES-1;
