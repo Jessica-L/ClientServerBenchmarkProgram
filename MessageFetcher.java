@@ -16,7 +16,6 @@ public class MessageFetcher extends Thread
         {
             MessageContainer<String> container = MessageQueue.queue.poll();
             if (container != null) {
-                    System.out.println("jfjdksl");
                     new MessageProcessor<String>(new Mapper<String>(new NothingMapping()),container).process();
             } 
             else

@@ -11,6 +11,7 @@ public class PipeServer
 {
     public static void main(String[] args) throws Exception
     {
+        /*
         String inputFilePath = "/tmp/input";
         if (!new File(inputFilePath).exists())
         {
@@ -32,5 +33,6 @@ public class PipeServer
                 new MessageReceiver(line);
             }
         }
+                */
     }
 }

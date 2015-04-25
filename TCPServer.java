@@ -11,14 +11,16 @@ import java.net.Socket;
 
 
 /**
- * TCPServer process.
+ * Create TCP Server process.
  */
 public class TCPServer {
     public static void main (String args[])
     {
-        for (int i = 0; i < 5; i++) {
-            MessageFetcher f = new MessageFetcher();
-        }
+        System.out.println( "Executing server." );
+        
+        //for (int i = 0; i < 5; i++) {
+            //MessageFetcher f = new MessageFetcher();
+        //}
 
         try
         {
@@ -31,7 +33,7 @@ public class TCPServer {
                     //Create socket and wait to receive message.
                     Socket clientSocket = listenSocket.accept();
                     //Spawn new thread to receive message.
-                    System.out.println(clientSocket);
+                    //System.out.println(clientSocket);
                     MessageReceiver mrThread = new MessageReceiver( clientSocket );
                 }
                 catch( IOException e )

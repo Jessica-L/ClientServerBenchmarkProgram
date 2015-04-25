@@ -1,7 +1,7 @@
 /*
- * Project: Client Server Performance Measurement Program
- * Authors: Jessica Lynch and Andrew Arnopoulos
- * Date:    27-Apr-2015
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
  */
 package clientserver;
 
@@ -12,15 +12,14 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 /**
- * Test driver to start server process and n number of client processes
- * (to establish contention).
+ * Test driver for shared memory client server program.
  */
-public class TCPClientServer extends Thread
+public class SharedMemoryClientServer extends Thread
 {
     private final String threadType;
     private final int clientNum;
     
-    public TCPClientServer( String threadType, int clientNum )
+    public SharedMemoryClientServer( String threadType, int clientNum )
     {
         this.threadType = threadType;
         this.clientNum  = clientNum;
@@ -29,30 +28,30 @@ public class TCPClientServer extends Thread
     public static void main(String[] args)
     {
         // *** FOR TESTING ***
-        int numClients = 10;
+        int numClients = 1;
         //int numClients = 10; // Set number of clients.
         //int numClients = 100; 
         //int numClients = 1000;
         
-        ArrayList<TCPClientServer> l = new ArrayList<>();
+        ArrayList<SharedMemoryClientServer> l = new ArrayList<>();
         
         //l.add( new TCPClientServer( "Server", -1 ) );
-        TCPClientServer serverThread = new TCPClientServer( "Server", -1 );
-        
+        SharedMemoryClientServer serverThread = new SharedMemoryClientServer( "Server", -1 );
+       /* 
         // Start n number of clients and assign unique id per client.
         for( int i = 0; i < numClients; i++ )
         {
-            l.add( new TCPClientServer( "Client", i ) );
+            l.add( new SharedMemoryClientServer( "Client", i ) );
         }
-        
+        */
         serverThread.start();
-        
-        for( TCPClientServer c : l )
+        /*
+        for( SharedMemoryClientServer c : l )
         {
             c.start();
         }
         
-        for( TCPClientServer c : l )
+        for( SharedMemoryClientServer c : l )
         {
             try
             {
@@ -65,7 +64,7 @@ public class TCPClientServer extends Thread
         }
         
         System.out.println( "Finished client execution." );
-        
+        */
         try
         {
             serverThread.join();
@@ -100,12 +99,12 @@ public class TCPClientServer extends Thread
             
             while( (line = err.readLine()) != null )
             {
-                System.out.println( "ERROR: " + command.get( 3 ) + (command.get( 3 ).equals( "clientserver.TCPClient" ) ? command.get( 4 ) : "") + ": " + line );
+                System.out.println( "ERROR: " + command.get( 3 ) + (command.get( 3 ).equals( "clientserver.SharedMemoryClient" ) ? command.get( 4 ) : "") + ": " + line );
             }
             
             while( (line = br.readLine()) != null )
             {
-                System.out.println( command.get( 3 ) + (command.get( 3 ).equals( "clientserver.TCPClient" ) ? command.get( 4 ) : "") + ": " + line );
+                System.out.println( command.get( 3 ) + (command.get( 3 ).equals( "clientserver.SharedMemoryClient" ) ? command.get( 4 ) : "") + ": " + line );
             }
             
            // p.waitFor();
@@ -141,14 +140,14 @@ public class TCPClientServer extends Thread
     public static void startServer()
     {
         System.out.println( "Starting Server." );
-        startProcess( TCPClientServer.buildArglist( "TCPServer", "" ) );
+        startProcess( TCPClientServer.buildArglist( "SharedMemoryServer", "" ) );
     }
     
     // Starts client process with unique id per process.
     public static void startClient( int num )
     {
         System.out.println( "Starting Client #" + num );
-        startProcess( TCPClientServer.buildArglist( "TCPClient", Integer.toString( num ) ) );
+        startProcess( TCPClientServer.buildArglist( "SharedMemoryClient", Integer.toString( num ) ) );
     }
 
     @Override
@@ -163,4 +162,65 @@ public class TCPClientServer extends Thread
            startClient( clientNum );
        }
     }
+ /*
+    public static void main(String[] args)
+    {
+        // *** FOR TESTING *** 
+        int numClients = 10; // Set number of clients.
+        //int numClients = 100; 
+        //int numClients = 1000;
+        
+        startServer();
+        // Start n number of clients and assign unique id per client.
+        for( int i = 0; i < numClients; i++ )
+        {
+            startClient( i );
+        }
+    }
+
+    // Starts process using ProcessBuilder.
+    public static void startProcess( ArrayList<String> command )
+    {
+        for( String s : command )
+        {
+            System.out.println( s );
+        }
+        ProcessBuilder pb = new ProcessBuilder( command );
+        try
+        {
+            Process p = pb.start();
+            System.out.println( "Exit value = " + p.exitValue() );
+        }
+        catch( IOException e )
+        {
+            System.out.println("IO: " + e.getMessage() );
+        }
+
+    }
+
+    // Starts server process.
+    public static void startServer()
+    {
+        ArrayList<String> argList = new ArrayList<String>();
+        argList.add("java");
+        argList.add( "-cp" );
+        argList.add( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\TCPClientServer\\dist\\TCPClientServer.jar" );
+        argList.add("SharedMemoryServer");
+        startProcess( argList );
+        System.out.println("Starting server process.");
+    }
+
+    // Starts client process with unique id per process.
+    public static void startClient( int num )
+    {
+        ArrayList<String> argList = new ArrayList<String>();
+        argList.add("java");
+        argList.add( "-cp" );
+        argList.add( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\TCPClientServer\\dist\\TCPClientServer.jar" );
+        argList.add("SharedMemoryClient");
+        argList.add( Integer.toString( num ) );
+        startProcess( argList );
+        System.out.println("Starting client process.");
+    }
+   */ 
 }

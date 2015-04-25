@@ -9,8 +9,6 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class MessageQueue
 {
-
-	public static ConcurrentLinkedQueue<MessageContainer<String>> queue = new ConcurrentLinkedQueue<MessageContainer<String>>();
-
+    public static ConcurrentLinkedQueue<MessageContainer<String>> queue = new ConcurrentLinkedQueue<MessageContainer<String>>();
 }
 

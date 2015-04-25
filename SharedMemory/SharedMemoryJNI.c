@@ -6,43 +6,109 @@
 
 #include <jni.h>
 #include <stdio.h>
-#include "SharedMemoryJNI.h"
+#include <string.h>
+//#include "SharedMemoryJNI.h"
 #include "SharedMemoryQueue.h"
  
 // Implementation of native method sayHello() of HelloJNI class
-JNIEXPORT void JNICALL Java_clientserver_SharedMemoryJNI_initServer(JNIEnv *env, jobject thisObj)
+JNIEXPORT void JNICALL
+Java_clientserver_SharedMemoryJNI_initServer( JNIEnv *env, jobject thisObj )
 {
-   q_server_init( void );
+   q_server_init();
 }
 
 // Implementation of native method initClient() of SharedMemoryJNI class
-JNIEXPORT void JNICALL Java_clientserver_SharedMemoryJNI_initClient(JNIEnv *env, jobject thisObj)
+JNIEXPORT void JNICALL
+Java_clientserver_SharedMemoryJNI_initClient( JNIEnv *env, jobject thisObj )
 {
-   q_client_init( void );
+   q_client_init();
 }
 
-// Implementation of native method sayHello() of HelloJNI class
-JNIEXPORT void JNICALL Java_clientserver_SharedMemoryJNI_enqueue(JNIEnv *env, jobject thisObj, jstring data )
+void
+queueAdd( JNIEnv *env, jobject thisObj, jstring data,
+          void (*enqueueFunc)( queueEntry_t *) )
 {
-    size_t length = (size_t)env->GetStringLength( data );
+    size_t length = (size_t)(*env)->GetStringLength( env, data );
     
     if( length > QUEUE_ENTRY_DATA_SIZE )
     {
-        env->ThrowNew( Exception, "String Size Too Large" );
+        char *className = "java/lang/Exception";
+        jclass exception = (*env)->FindClass( env, className );
+
+       (*env)->ThrowNew( env, exception, "String Size Too Large" );
     }
     
-    queueEntry_t *entry = q_alloc_entry( void );
-    const char  *cStr  = env->GetStringChars( data, NULL );
+    queueEntry_t *entry = q_alloc_entry();
+    //const jchar  *cStr  = GetStringChars( env, data, NULL );
+
+    const jchar  *cStr  = (*env)->GetStringChars( env, data, NULL );
+
     memcpy( entry->data, cStr, length );
-    q_enqueue( entry );
-    env->ReleaseStringChars( data, cStr );
+    (*enqueueFunc)( entry );
+    (*env)->ReleaseStringChars( env, data, cStr );
+}
+// Implementation of native method enqueue() of HelloJNI class
+JNIEXPORT void JNICALL
+Java_clientserver_SharedMemoryJNI_enqueue( JNIEnv *env, jobject thisObj,
+                                           jstring data )
+{
+    queueAdd( env, thisObj, data, q_enqueue );
 }
 
-// Implementation of native method sayHello() of HelloJNI class
-JNIEXPORT jstring JNICALL Java_clientserver_SharedMemoryJNI_dequeue(JNIEnv *env, jobject thisObj)
+JNIEXPORT void JNICALL
+Java_clientserver_SharedMemoryJNI_enqueueResp( JNIEnv *env, jobject thisObj,
+                                               jstring data )
 {
-   queueEntry_t *entry = q_dequeue( void );
-   jstring  str = env->NewString( (const jchar *)entry->data, strlen( entry->data ) );
+    queueAdd( env, thisObj, data, q_enqueueResponse );
+}
+
+jstring
+queueRemove( JNIEnv *env, jobject thisObj, queueEntry_t *(*dequeueFunc)() )
+{
+   queueEntry_t *entry = (*dequeueFunc)();
+   jstring  str = (*env)->NewString( env, (const jchar *)entry->data,
+                                     strlen( entry->data ) );
    q_free_entry( entry );
    return str;
+}
+
+// Implementation of native method dequeue() of SharedMemoryJNI class
+JNIEXPORT jstring JNICALL
+Java_clientserver_SharedMemoryJNI_dequeue( JNIEnv *env, jobject thisObj )
+{
+    return( queueRemove( env, thisObj, q_dequeue ) );
+}
+
+JNIEXPORT jstring JNICALL
+Java_clientserver_SharedMemoryJNI_dequeueResp( JNIEnv *env, jobject thisObj )
+{
+    return( queueRemove( env, thisObj, q_dequeueResponse ) );
+}
+
+// Implementation of native method shmNotify() of SharedMemoryJNI class
+JNIEXPORT void JNICALL
+Java_clientserver_SharedMemoryJNI_shmNotify( JNIEnv *env, jobject thisObj )
+{
+    q_notify();
+}
+
+// Implementation of native method shmWait() of SharedMemoryJNI class
+JNIEXPORT void JNICALL
+Java_clientserver_SharedMemoryJNI_shmWait( JNIEnv *env, jobject thisObj )
+{
+    q_wait();
+}
+
+// Implementation of native method shmNotify() of SharedMemoryJNI class
+JNIEXPORT void JNICALL
+Java_clientserver_SharedMemoryJNI_shmNotifyResp( JNIEnv *env, jobject thisObj )
+{
+    q_notifyResponse();
+}
+
+// Implementation of native method shmWait() of SharedMemoryJNI class
+JNIEXPORT void JNICALL
+Java_clientserver_SharedMemoryJNI_shmWaitResp( JNIEnv *env, jobject thisObj )
+{
+    q_waitResponse();
 }

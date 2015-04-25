@@ -8,13 +8,15 @@ package clientserver;
 import java.net.*;
 import java.io.*;
 import java.nio.ByteBuffer;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
- * TCPClient process.
+ * Create TCP Client process.
  */
 public class TCPClient
 {
-    private int clientId;  // Used to create unique message per client.
+    private final int clientId;  // Used to create unique message per client.
     private Socket socket; // Used to establish connection between client and server processes.
     
     // TCPClient constructor.
@@ -27,13 +29,27 @@ public class TCPClient
     // Open connection between client process and server.
     public void openConnection( int port, String ip ) throws TCPException
     {
-        try
+        int retries = 0;
+        while( retries++ < 5 )
         {
-            socket = new Socket( ip, port );
-        }
-        catch( IOException e )
-        {
-            throw new TCPException("Socket failed: " + e.getMessage() );
+            try
+            {
+                socket = new Socket( ip, port );
+                break;
+            }
+            catch( IOException e )
+            {
+                System.out.println( "Socket failed for client " + clientId + ": " + e.getMessage() );
+                try
+                {
+                    Thread.sleep( 100 );
+                    //throw new TCPException("Socket failed client " + clientId + ": " + e.getMessage() );
+                }
+                catch(InterruptedException ex)
+                {
+                    Logger.getLogger(TCPClient.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
         }
     }
     
@@ -51,10 +67,10 @@ public class TCPClient
             
             //***SEND MESSAGE***//
             //Step 1 -- send length.
-            System.out.println("Write Length: " + len );
+            //System.out.println("client " + clientId + ": Write Length: " + len );
             output.writeInt( len );
             //Step 2 -- send byte.
-            System.out.println("Writing ...");
+            //System.out.println("client " + clientId + ": Writing ...");
             output.write( data, 0, len ); //UTF is a string encoding.
             
             //***RECEIVE RESPONSE (IF APPLICABLE)***//
@@ -68,19 +84,19 @@ public class TCPClient
             }
             // Next two lines only for testing:
             str = new String( digit );
-            System.out.println("Received: " + str);
+            System.out.println("client " + clientId + ": Received: " + str);
         }
         catch( UnknownHostException e )
         {
-            System.out.println("Socket: " + e.getMessage() );
+            System.out.println("client " + clientId + ": Socket: " + e.getMessage() );
         }
         catch( EOFException e )
         {
-            System.out.println("EOF: " + e.getMessage() );
+            System.out.println("client " + clientId + ": EOF: " + e.getMessage() );
         }
         catch( IOException e )
         {
-            System.out.println("IO: " + e.getMessage() );
+            System.out.println("client " + clientId + ": IO: " + e.getMessage() );
         }
     }
     
@@ -100,16 +116,16 @@ public class TCPClient
     public void closeConnection() throws TCPException
     {
         if( socket != null )
+        {
+            try
             {
-                try
-                {
-                    socket.close();
-                }
-                catch( IOException e )
-                {
-                    throw new TCPException("Close socket failed: " + e.getMessage() );
-                }
+                socket.close();
             }
+            catch( IOException e )
+            {
+                throw new TCPException("client " + clientId + ": Close socket failed: " + e.getMessage() );
+            }
+        }
     }
     
     // Starts connection between a single client process and server process 
@@ -117,8 +133,12 @@ public class TCPClient
     // up to some number of events, numEvents.
     public static void main( String args[] )
     {
-        // Set number of events to experiment with frequency of messages (Message Load setting).
-        int numEvents = 1000;
+        // *** FOR TESTING *** Set number of events to experiment with frequency
+        // of messages (Message Load setting).
+        int numEvents = 5;
+        //int numEvents = 10;
+        //int numEvents = 250;
+        //int numEvents = 1000;
         
         TCPClient tcpClient = null;
         int serverPort = 6880;
@@ -126,17 +146,19 @@ public class TCPClient
         int id;
         byte[] dataStream;
         
+        try
+        {
+            tcpClient = new TCPClient(Integer.parseInt(args[0]));
+        }
+        catch( NumberFormatException nfe )
+        {
+            System.out.println("Invalid parameter passed: " + nfe.getMessage() );
+            System.exit(1);
+        }
+        
         for( int i = 0; i < numEvents; i++ )
         {
-            try
-            {
-                tcpClient = new TCPClient(Integer.parseInt(args[0]));
-            }
-            catch( NumberFormatException nfe )
-            {
-                System.out.println("Invalid parameter passed: " + nfe.getMessage() );
-                System.exit(1);
-            }
+            System.out.println( "Executing Client " + args[0] + ": iteration #" + i );
 
             try
             {

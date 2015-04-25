@@ -37,8 +37,9 @@ public class MessageReceiver extends Thread implements MessageSender<String>
         }
     }
 
+    @Override
     public void sendMessage(String str) {
-        System.out.println("Receive from: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " message - " + str);
+        //System.out.println("Receive from: " + clientSocket.getInetAddress() + ":" + clientSocket.getPort() + " message - " + str);
         try {
             System.out.println(str);
             output.writeInt(str.length());
@@ -59,6 +60,7 @@ public class MessageReceiver extends Thread implements MessageSender<String>
         
     }
 
+    @Override
     public void run() 
     {
         int numBytes;
@@ -70,9 +72,9 @@ public class MessageReceiver extends Thread implements MessageSender<String>
         try 
         {
             numBytes = input.readInt();
-            System.out.println("Read length: " + numBytes);
+            //System.out.println("Read length: " + numBytes);
             digit = new byte[numBytes];
-            System.out.println("Writing ...");
+            //System.out.println("Writing ...");
             for( int i = 0; i < numBytes; i++ )
             {
                 try
@@ -86,12 +88,13 @@ public class MessageReceiver extends Thread implements MessageSender<String>
             }
 
             str = new String( digit );
-            System.out.println("hello" + str);
+            //System.out.println("hello" + str);
             //bufWriter.append( str );
             //bufWriter.close();
 
-            MessageQueue.queue.add(new MessageContainer<String>(this,str));
-            
+           // MessageQueue.queue.add(new MessageContainer<String>(this,str));
+
+            this.sendMessage( "Server Response: " + str );
         }
         catch( EOFException e )
         {
@@ -101,8 +104,6 @@ public class MessageReceiver extends Thread implements MessageSender<String>
         {
             System.out.println("Output file: " + e.getMessage() );
         }
-        
-              
     }
     
 }
