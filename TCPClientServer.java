@@ -6,10 +6,18 @@
 package clientserver;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.io.RandomAccessFile;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Test driver to start server process and n number of client processes
@@ -25,6 +33,26 @@ public class TCPClientServer extends Thread
         this.threadType = threadType;
         this.clientNum  = clientNum;
     }
+
+    private static void printFinalReport()
+    {
+        try
+	{
+            RandomAccessFile raf = new RandomAccessFile( "/tmp/TCPDataFile", "rw" );
+	    long             t   = raf.readLong();
+	    System.out.println( "t = " + t );
+	    raf.close();
+	    System.out.println( "Total TCP Client to Server to Client run time is " + t + " nanoseconds = " + t / 1000000 + " milliseconds." );
+        }
+	catch (FileNotFoundException ex)
+	{
+            System.out.println( "Failed to open TCPDataFile for reading: " + ex.getMessage() );
+        }
+	catch( IOException ex )
+	{
+            System.out.println( "Failed to read from TCPDataFile: " + ex.getMessage() );
+        }
+    }
     
     public static void main(String[] args)
     {
@@ -33,7 +61,24 @@ public class TCPClientServer extends Thread
         //int numClients = 10; // Set number of clients.
         //int numClients = 100; 
         //int numClients = 1000;
-        
+
+	//File dataFile = new File( "/tmp/TCPDataFile" );
+        try
+	{
+            //dataFile.createNewFile();
+            System.out.println( "Writing 0 to the file." );
+	    //(new BufferedWriter( new OutputStreamWriter( new FileOutputStream( "/tmp/TCPDataFile" ) ) ) ).write( "0" );
+	    //(new FileWriter( "/tmp/TCPDataFile" )).write( "0" );
+	    RandomAccessFile raf = new RandomAccessFile( "/tmp/TCPDataFile", "rw" );
+	    raf.writeLong( 0 );
+	    raf.close();
+        }
+	catch( IOException ex )
+	{
+            System.out.println( "Failed to create TCPDataFile." );
+	    System.exit( 5 );
+        }
+
         ArrayList<TCPClientServer> l = new ArrayList<>();
         
         //l.add( new TCPClientServer( "Server", -1 ) );
@@ -76,6 +121,9 @@ public class TCPClientServer extends Thread
         }
         
         System.out.println( "Server finished execution." );
+
+	(new File( "/tmp/serverReady" )).delete();
+	printFinalReport();
     }
     
     // Starts process using ProcessBuilder.
@@ -88,7 +136,8 @@ public class TCPClientServer extends Thread
             //System.out.println( "command 4 = " + command.get( 4 ) );
             
         ProcessBuilder pb = new ProcessBuilder( command );
-        pb.directory( new File( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\TCPClientServer\\dist" ) );
+        //pb.directory( new File( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\TCPClientServer\\dist" ) );
+        pb.directory( new File( "/home/christopher/helpJess/concProgProject" ) );
         
         try
         {
@@ -127,7 +176,7 @@ public class TCPClientServer extends Thread
         ArrayList<String> argList = new ArrayList<>();
         argList.add( "java" );
         argList.add( "-cp" );
-        argList.add( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\TCPClientServer\\dist\\TCPClientServer.jar" );
+        argList.add( "C:/home/christopher/helpJess/concProgProject/queueProject.jar" );
         argList.add( "clientserver." + className );
         if( !arg.equals( "" ) )
         {

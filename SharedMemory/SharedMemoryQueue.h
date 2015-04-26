@@ -1,7 +1,8 @@
-/*
- * Project: Client Server Performance Measurement Program
- * Authors: Jessica Lynch and Andrew Arnopoulos
- * Date:    27-Apr-2015
+/* 
+ * File:   sharedMemoryQueue.h
+ * Author: christopher
+ *
+ * Created on April 25, 2015, 1:56 PM
  */
 
 #ifndef SHAREDMEMORYQUEUE_H
@@ -45,6 +46,7 @@ void q_enqueueResponse( queueEntry_t *entry );
 queueEntry_t *q_dequeueResponse( void );
 void q_notifyResponse( void );
 void q_waitResponse( void );
+
 
 #ifdef	__cplusplus
 }

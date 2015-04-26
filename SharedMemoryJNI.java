@@ -13,7 +13,7 @@ public class SharedMemoryJNI
 {
    static
    {
-       System.loadLibrary("libSharedMemoryQueue"); // Load native library at runtime
+       System.loadLibrary("SharedMemory"); // Load native library at runtime
       // System.load( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\SharedMemoryQueue\\dist\\Debug\\Cygwin_4.x-Windows\\libSharedMemoryQueue.dll" );
    }
 

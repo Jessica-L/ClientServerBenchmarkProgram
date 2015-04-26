@@ -5,6 +5,7 @@
  */
 package clientserver;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -26,6 +27,17 @@ public class TCPServer {
         {
             int serverPort = 6880;
             ServerSocket listenSocket = new ServerSocket( serverPort );
+
+	    try
+	    {
+                (new File( "/tmp/serverReady" )).createNewFile();
+            }
+	    catch( IOException ioe )
+	    {
+                System.out.println( "Failed to create tmp/serverReady: " + ioe.getMessage() );
+	        System.exit( 5 );
+            }
+
             System.out.println("Server start listening now ...");
             while( true ) {
                 try

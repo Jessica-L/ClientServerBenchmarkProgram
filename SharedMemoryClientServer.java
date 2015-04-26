@@ -9,6 +9,7 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.nio.file.Files;
 import java.util.ArrayList;
 
 /**
@@ -28,7 +29,7 @@ public class SharedMemoryClientServer extends Thread
     public static void main(String[] args)
     {
         // *** FOR TESTING ***
-        int numClients = 1;
+        int numClients = 256;
         //int numClients = 10; // Set number of clients.
         //int numClients = 100; 
         //int numClients = 1000;
@@ -37,15 +38,15 @@ public class SharedMemoryClientServer extends Thread
         
         //l.add( new TCPClientServer( "Server", -1 ) );
         SharedMemoryClientServer serverThread = new SharedMemoryClientServer( "Server", -1 );
-       /* 
+
         // Start n number of clients and assign unique id per client.
         for( int i = 0; i < numClients; i++ )
         {
             l.add( new SharedMemoryClientServer( "Client", i ) );
         }
-        */
+
         serverThread.start();
-        /*
+
         for( SharedMemoryClientServer c : l )
         {
             c.start();
@@ -64,7 +65,7 @@ public class SharedMemoryClientServer extends Thread
         }
         
         System.out.println( "Finished client execution." );
-        */
+
         try
         {
             serverThread.join();
@@ -75,6 +76,12 @@ public class SharedMemoryClientServer extends Thread
         }
         
         System.out.println( "Server finished execution." );
+
+	(new File( "/tmp/smInitialized" )).delete();
+	(new File( "/var/run/shm/FreeQueue" )).delete();
+	(new File( "/var/run/shm/Queue" )).delete();
+	(new File( "/var/run/shm/QueueEntries" )).delete();
+	(new File( "/var/run/shm/ResponseQ" )).delete();
     }
     
     // Starts process using ProcessBuilder.
@@ -87,7 +94,8 @@ public class SharedMemoryClientServer extends Thread
             //System.out.println( "command 4 = " + command.get( 4 ) );
             
         ProcessBuilder pb = new ProcessBuilder( command );
-        pb.directory( new File( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\TCPClientServer\\dist" ) );
+        pb.directory( new File( "/home/christopher/helpJess/concProgProject" ) );
+        //pb.directory( new File( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\TCPClientServer\\dist" ) );
         
         try
         {
@@ -126,7 +134,8 @@ public class SharedMemoryClientServer extends Thread
         ArrayList<String> argList = new ArrayList<>();
         argList.add( "java" );
         argList.add( "-cp" );
-        argList.add( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\TCPClientServer\\dist\\TCPClientServer.jar" );
+        argList.add( "/home/christopher/helpJess/concProgProject/queueProject.jar" );
+        //argList.add( "C:\\Users\\Jessica\\Documents\\NetBeansProjects\\TCPClientServer\\dist\\TCPClientServer.jar" );
         argList.add( "clientserver." + className );
         if( !arg.equals( "" ) )
         {
@@ -140,14 +149,14 @@ public class SharedMemoryClientServer extends Thread
     public static void startServer()
     {
         System.out.println( "Starting Server." );
-        startProcess( TCPClientServer.buildArglist( "SharedMemoryServer", "" ) );
+        startProcess( SharedMemoryClientServer.buildArglist( "SharedMemoryServer", "" ) );
     }
     
     // Starts client process with unique id per process.
     public static void startClient( int num )
     {
         System.out.println( "Starting Client #" + num );
-        startProcess( TCPClientServer.buildArglist( "SharedMemoryClient", Integer.toString( num ) ) );
+        startProcess( SharedMemoryClientServer.buildArglist( "SharedMemoryClient", Integer.toString( num ) ) );
     }
 
     @Override

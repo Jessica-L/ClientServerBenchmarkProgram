@@ -8,14 +8,15 @@ package clientserver;
 import java.net.*;
 import java.io.*;
 import java.nio.ByteBuffer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.nio.channels.FileLock;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Create TCP Client process.
  */
 public class TCPClient
 {
+    private static final AtomicLong totalTime = new AtomicLong();
     private final int clientId;  // Used to create unique message per client.
     private Socket socket; // Used to establish connection between client and server processes.
     
@@ -27,7 +28,7 @@ public class TCPClient
     }
 
     // Open connection between client process and server.
-    public void openConnection( int port, String ip ) throws TCPException
+    public void openConnection( int port, String ip )
     {
         int retries = 0;
         while( retries++ < 5 )
@@ -47,7 +48,6 @@ public class TCPClient
                 }
                 catch(InterruptedException ex)
                 {
-                    Logger.getLogger(TCPClient.class.getName()).log(Level.SEVERE, null, ex);
                 }
             }
         }
@@ -127,6 +127,67 @@ public class TCPClient
             }
         }
     }
+
+    private static void waitToStart()
+    {
+        File f = new File( "/tmp/serverReady" );
+
+        while( !f.exists() )
+        {
+            try
+	    {
+                Thread.sleep( 2 );
+            }
+	    catch( InterruptedException ex )
+	    {
+            }
+	}
+    }
+
+    public static void reportTotalTime()
+    {
+        System.out.println( "Total Time is " + totalTime + "nanoseconds = "
+		          + totalTime.get() / 1000000 + "milliseconds" );
+
+	try
+	{
+            RandomAccessFile dataFile = new RandomAccessFile( "/tmp/TCPDataFile", "rw" );
+	    FileLock         lock     = dataFile.getChannel().lock();
+
+	    try
+	    {
+	        long t = dataFile.readLong();
+		System.out.println( "t = " + t );
+	        t += totalTime.get();
+
+	        try
+	        {
+	            dataFile.writeLong( t );
+	            dataFile.close();
+	        }
+	        catch( IOException ioe )
+	        {
+                    System.out.println( "Failed to write data: " + ioe.getMessage() );
+	            System.exit( 5 );
+	        }
+	    }
+            catch( IOException ioe )
+	    {
+                System.out.println( "Failed to read data: " + ioe.getMessage() );
+	        System.exit( 5 );
+            }
+	}
+	catch( FileNotFoundException fnfe )
+	{
+            System.out.println( "Failed to open TCPDataFile: " + fnfe.getMessage() );
+	    System.exit( 5 );
+        }
+	catch( IOException ioe )
+        {
+            System.out.println( "Failed to lock file: " + ioe.getMessage() );
+            System.exit( 5 );
+        }
+    }
     
     // Starts connection between a single client process and server process 
     // where client sends message to server and receives response (if applicable)
@@ -145,6 +206,9 @@ public class TCPClient
         String ip = "localhost";
         int id;
         byte[] dataStream;
+	long startTime;
+
+	waitToStart();
         
         try
         {
@@ -160,15 +224,9 @@ public class TCPClient
         {
             System.out.println( "Executing Client " + args[0] + ": iteration #" + i );
 
-            try
-            {
-                tcpClient.openConnection( serverPort, ip );
-            }
-            catch( TCPException tcpe )
-            {
-                System.out.println("Connection failed: " + tcpe.getMessage() );
-                System.exit(2);
-            }
+	    startTime = System.nanoTime();
+
+            tcpClient.openConnection( serverPort, ip );
 
             id = tcpClient.getTCPClientId();
             // dataStream = tcpClient.intToByteArray( id );
@@ -186,6 +244,9 @@ public class TCPClient
                 System.exit(3);
             }
             
+	    totalTime.addAndGet( System.nanoTime() - startTime );
+
+	    reportTotalTime();
         }
         
     }   

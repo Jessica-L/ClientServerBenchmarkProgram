@@ -6,9 +6,10 @@
 
 #include <jni.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 //#include "SharedMemoryJNI.h"
-#include "SharedMemoryQueue.h"
+#include "sharedMemoryQueue.h"
  
 // Implementation of native method sayHello() of HelloJNI class
 JNIEXPORT void JNICALL
@@ -39,13 +40,21 @@ queueAdd( JNIEnv *env, jobject thisObj, jstring data,
     }
     
     queueEntry_t *entry = q_alloc_entry();
-    //const jchar  *cStr  = GetStringChars( env, data, NULL );
+    //const jchar  *cStr  = (*env)->GetStringChars( env, data, NULL );
+    const char  *cStr  = (*env)->GetStringUTFChars( env, data, NULL );
 
-    const jchar  *cStr  = (*env)->GetStringChars( env, data, NULL );
+    if( entry == NULL )
+    {
+	printf( "Failed to allocate free entry.\n" );
+	abort();
+    }
 
+    //printf( "Copying data to entry.\n" );
     memcpy( entry->data, cStr, length );
+    //printf( "Adding message %s to queue: length = %zd.\n",
+	    //entry->data, length );
     (*enqueueFunc)( entry );
-    (*env)->ReleaseStringChars( env, data, cStr );
+    (*env)->ReleaseStringUTFChars( env, data, cStr );
 }
 // Implementation of native method enqueue() of HelloJNI class
 JNIEXPORT void JNICALL
@@ -66,8 +75,7 @@ jstring
 queueRemove( JNIEnv *env, jobject thisObj, queueEntry_t *(*dequeueFunc)() )
 {
    queueEntry_t *entry = (*dequeueFunc)();
-   jstring  str = (*env)->NewString( env, (const jchar *)entry->data,
-                                     strlen( entry->data ) );
+   jstring  str = (*env)->NewStringUTF( env, entry->data );
    q_free_entry( entry );
    return str;
 }

@@ -5,13 +5,18 @@
  */
 package clientserver;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  *
  * @author Jessica
  */
 public class SharedMemoryServer
 {
-    SharedMemoryJNI shm;
+    private SharedMemoryJNI shm;
     
     public SharedMemoryServer()
     {
@@ -23,7 +28,9 @@ public class SharedMemoryServer
     {
         while( true )
         {
+            //System.out.println( "Server: Waiting for notification" );
             shm.waitForNotification();
+            //System.out.println( "Server: Notification received, retrieving message." );
             
             processMsg( shm.dequeueData() );
         }
@@ -31,13 +38,25 @@ public class SharedMemoryServer
     
     private void processMsg( String msg )
     {
-        shm.enqueueResponse( "Received message: " + msg );
+        //System.out.println( "Server received message " + msg + "." );
+        shm.enqueueResponse( "Server: Received message: " + msg );
+        shm.responseNotification();
     }
     
     public static void main(String[] args)
     {
-        System.out.println("Entering shared memory client main.");
+        //System.out.println("Entering shared memory server main.");
         SharedMemoryServer s = new SharedMemoryServer();
+        try
+	{
+            (new File( "/tmp/smInitialized" )).createNewFile();
+        }
+	catch( IOException ioe )
+	{
+            System.out.println( "Failed to create tmp/smInitialized: " + ioe.getMessage() );
+	    System.exit( 5 );
+        }
+
         s.run();
     }
 }
